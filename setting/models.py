@@ -1,0 +1,148 @@
+from django.db import models
+from django.core.exceptions import ValidationError
+from colorfield.fields import ColorField
+
+class Setting(models.Model):
+    site_name = models.CharField(max_length=100)
+    site_banner_small = models.ImageField(upload_to='images/site/')
+    site_banner_large = models.ImageField(upload_to='images/site/')
+    site_banner_collections = models.ImageField(upload_to='images/site/')
+    site_description = models.TextField(max_length=200)
+    site_address = models.CharField(max_length=200)
+    site_phone = models.CharField(max_length=20)
+    site_email = models.CharField(max_length=100)
+    site_reg_no = models.CharField(max_length=100)
+    site_website = models.CharField(max_length=100)
+    site_facebook = models.CharField(max_length=100)
+    site_instagram = models.CharField(max_length=100)
+    site_tiktok = models.CharField(max_length=100)
+
+    site_icon = models.ImageField(upload_to='images/site/')
+    site_logo = models.ImageField(upload_to='images/site/')
+    site_favicon = models.ImageField(upload_to='images/site/')
+
+    def __str__(self):
+        return self.site_name
+    
+    def save(self, *args, **kwargs):
+        if not self.pk and Setting.objects.exists():
+            pass
+        else:
+            return super(Setting, self).save(*args, **kwargs)
+
+class Currency(models.Model):
+    setting = models.OneToOneField(Setting, on_delete=models.CASCADE)
+    currency_code = models.CharField(max_length=3, help_text='Enter currency code. Example: USD, EUR, GBP, etc.', blank=True, null=True)
+    currency_symbol = models.CharField(max_length=5, help_text='Enter currency symbol. Example: $, €, £, etc.')
+
+    def __str__(self):
+        return f'{self.currency_code} {self.currency_symbol}'
+    
+    class Meta:
+        verbose_name_plural = 'Currency'
+        
+
+class TaxAndShipment(models.Model):
+    setting = models.ForeignKey(Setting, on_delete=models.CASCADE)
+    city = models.CharField(max_length=100, help_text='Enter city name.')
+    tax_rate = models.DecimalField(
+        max_digits=10,
+        decimal_places=3,
+        help_text='Enter tax rate e.g. 5.00 for 5% tax.',
+        default=0.00
+    )
+    
+    shipment_amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        help_text='Enter shipment amount.',
+        default=0.00
+    )
+
+    def __str__(self):
+        return f'{self.city}'
+
+    class Meta:
+        verbose_name_plural = 'Tax and Shipment'
+        
+        
+class SiteMeta(models.Model):
+    setting = models.OneToOneField(Setting, on_delete=models.CASCADE)
+    meta_title = models.CharField(max_length=100)
+    meta_description = models.TextField(max_length=200)
+    meta_keywords = models.TextField()
+    meta_author = models.CharField(max_length=100)
+    meta_robots = models.CharField(max_length=100)
+    meta_image = models.ImageField(upload_to='images/site/')
+    
+    def __str__(self):
+        return f'{self.meta_title}'
+
+    class Meta:
+        verbose_name_plural = 'Site Meta'
+        
+
+class Color(models.Model):
+    setting = models.ForeignKey(Setting, on_delete=models.CASCADE)
+    code = ColorField(default='#FFFFFF')
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f'{self.name}'
+    
+class Size(models.Model):
+    setting = models.ForeignKey(Setting, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f'{self.name}'
+
+class AboutUs(models.Model):
+    setting = models.OneToOneField(Setting, on_delete=models.CASCADE)
+    content = models.TextField()
+    
+    def __str__(self):
+        return 'About Us'
+    
+    class Meta:
+        verbose_name_plural = 'About Us'
+
+class PrivacyPolicy(models.Model):
+    setting = models.OneToOneField(Setting, on_delete=models.CASCADE)
+    content = models.TextField()
+    
+    def __str__(self):
+        return 'Privacy Policy'
+    
+    class Meta:
+        verbose_name_plural = 'Privacy Policy'
+
+class ShippingPolicy(models.Model):
+    setting = models.OneToOneField(Setting, on_delete=models.CASCADE)
+    content = models.TextField()
+    
+    def __str__(self):
+        return 'Shipping Policy'
+    
+    class Meta:
+        verbose_name_plural = 'Shipping Policy'
+
+class TermsAndConditions(models.Model):
+    setting = models.OneToOneField(Setting, on_delete=models.CASCADE)
+    content = models.TextField()
+    
+    def __str__(self):
+        return 'Terms and Conditions'
+    
+    class Meta:
+        verbose_name_plural = 'Terms and Conditions'
+        
+class ReturnsAndRefundsPolicy(models.Model):
+    setting = models.OneToOneField(Setting, on_delete=models.CASCADE)
+    content = models.TextField()
+    
+    def __str__(self):
+        return 'Returns and Refunds Policy'
+    
+    class Meta:
+        verbose_name_plural = 'Returns and Refunds Policy'
